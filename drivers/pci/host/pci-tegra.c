@@ -1601,12 +1601,13 @@ static void tegra_pcie_add_port(int index, u32 offset, u32 reset_reg)
 	pp->base = tegra_pcie.regs + offset;
 	pp->link_up = tegra_pcie_check_link(pp, index, reset_reg);
 
-	if (!pp->link_up) {
-		pp->base = NULL;
-		pr_info("PCIE: port %d: link down, ignoring\n", index);
-		tegra_pcie_disable_ctlr(index);
-		return;
-	}
+	/* FS: Don't disable the link, even when no device was found */
+	//if (!pp->link_up) {
+	//	pp->base = NULL;
+	//	pr_info("PCIE: port %d: link down, ignoring\n", index);
+	//	tegra_pcie_disable_ctlr(index);
+	//	return;
+	//}
 	tegra_pcie_enable_rp_features(index);
 
 	tegra_pcie.num_ports++;
