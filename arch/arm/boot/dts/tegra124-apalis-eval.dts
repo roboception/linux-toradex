@@ -96,6 +96,20 @@
 		nvidia,bit-banging-xfer-after-shutdown;
 	};
 
+	/* I2C devices on baseboard */
+	i2c@7000c000 {
+		tmp102@48 {
+			compatible = "ti,tmp102";
+			label = "temp_regulator";
+			reg = <0x48>;
+		};
+		tmp102@49 {
+			compatible = "ti,tmp102";
+			label = "temp_fpga";
+			reg = <0x49>;
+		};
+	};
+
 	memory@0x80000000 {
 		device_type = "memory";
 		reg = <0x0 0x80000000 0x0 0x80000000>;
