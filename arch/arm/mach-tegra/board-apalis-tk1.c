@@ -62,6 +62,7 @@
 #include <linux/tegra_fiq_debugger.h>
 #include <linux/platform_data/tegra_usb_modem_power.h>
 #include <linux/platform_data/tegra_ahci.h>
+#include <linux/platform_data/leds-lp55xx.h>
 #include <linux/irqchip/tegra.h>
 #include <sound/max98090.h>
 #include <linux/pci.h>
@@ -94,6 +95,98 @@
 #include "pm.h"
 #include "tegra-board-id.h"
 #include "tegra-of-dev-auxdata.h"
+
+/* Current format: 10x mA (i.e. 10 means 1.0mA) */
+#define LP5523_RED_CURRENT   3
+#define LP5523_GREEN_CURRENT 2
+#define LP5523_BLUE_CURRENT  4
+
+static struct lp55xx_led_config apalis_tk1_lp5523_led_config[] = {
+	{
+		.name        = "green",
+		.chan_nr     = 0,
+		.led_current = LP5523_GREEN_CURRENT,
+		.max_current = LP5523_GREEN_CURRENT,
+	},
+	{
+		.name        = "blue",
+		.chan_nr     = 1,
+		.led_current = LP5523_BLUE_CURRENT,
+		.max_current = LP5523_BLUE_CURRENT,
+	},
+	{
+		.name        = "d3",
+		.chan_nr     = 2,
+		.led_current = 0,
+		.max_current = 0,
+	},
+	{
+		.name        = "d4",
+		.chan_nr     = 3,
+		.led_current = 0,
+		.max_current = 0,
+	},
+	{
+		.name        = "d5",
+		.chan_nr     = 4,
+		.led_current = 0,
+		.max_current = 0,
+	},
+	{
+		.name        = "d6",
+		.chan_nr     = 5,
+		.led_current = 0,
+		.max_current = 0,
+	},
+	{
+		.name        = "red",
+		.chan_nr     = 6,
+		.led_current = LP5523_RED_CURRENT,
+		.max_current = LP5523_RED_CURRENT,
+	},
+	{
+		.name        = "d8",
+		.chan_nr     = 7,
+		.led_current = 0,
+		.max_current = 0,
+	},
+	{
+		.name        = "d9",
+		.chan_nr     = 8,
+		.led_current = 0,
+		.max_current = 0,
+	},
+};
+
+static int apalis_tk1_lp5523_setup(void)
+{
+	return 0;
+}
+
+static void apalis_tk1_lp5523_release(void)
+{
+/* Nothing to be done here */
+}
+
+static void apalis_tk1_lp5523_enable(bool state)
+{
+/* Nothing to be done here */
+}
+
+static struct lp55xx_platform_data apalis_tk1_lp5523_platform_data = {
+	.led_config        = apalis_tk1_lp5523_led_config,
+	.num_channels      = ARRAY_SIZE(apalis_tk1_lp5523_led_config),
+	.clock_mode        = LP55XX_CLOCK_INT,
+	.setup_resources   = apalis_tk1_lp5523_setup,
+	.release_resources = apalis_tk1_lp5523_release,
+	.enable            = apalis_tk1_lp5523_enable,
+};
+
+static struct i2c_board_info __initdata apalis_tk1_lp5523_board_info = {
+	/* LP55231 LED driver */
+	I2C_BOARD_INFO("lp5523", 0x32),
+	.platform_data = &apalis_tk1_lp5523_platform_data,
+};
 
 static struct i2c_board_info apalis_tk1_sgtl5000_board_info = {
 	/* SGTL5000 audio codec */
@@ -140,6 +233,7 @@ static __initdata struct tegra_clk_init_table apalis_tk1_clk_init_table[] = {
 
 static void apalis_tk1_i2c_init(void)
 {
+	i2c_register_board_info(0, &apalis_tk1_lp5523_board_info, 1);
 	i2c_register_board_info(4, &apalis_tk1_sgtl5000_board_info, 1);
 }
 
