@@ -1,0 +1,33 @@
+before_script:
+  - export DISTRO_CODENAME=`lsb_release -cs` && echo Using distro $DISTRO_CODENAME
+  - apt-get update -yq && apt-get install -y lintian bc bison gawk fakeroot build-essential binutils-dev kernel-wedge kernel-package u-boot-tools
+
+#############
+# Templates
+#############
+.amd64_template: &amd64_job   # Hidden job that defines an anchor named 'amd64_job'
+  image: registry.roboception.de/tools/docker_images:buildimage
+  tags:
+    - amd64
+    - docker
+
+.armhf_template: &armhf_job   # Hidden job that defines an anchor named 'armhf_job'
+  image: registry.roboception.de/tools/docker_images:armhf-buildimage
+  tags:
+    - armhf
+    - docker
+
+
+build:
+  <<: *armhf_job
+  script:
+    - make rc_visard_defconfig
+    - make -j4 uImage
+    - make -j4 KBUILD_DEBARCH=armhf deb-pkg
+    #- make-kpkg -j4 --rootcmd fakeroot kernel_image kernel_headers
+    - mv ../linux-headers-*.deb .
+    - mv ../linux-image-*.deb .
+  artifacts:
+    paths:
+      - arch/arm/boot/uImage
+      - ./*.deb
