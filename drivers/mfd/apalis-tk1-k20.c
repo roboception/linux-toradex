@@ -678,8 +678,9 @@ static uint8_t apalis_tk1_k20_fw_ezport_status(void)
 
 static uint8_t apalis_tk1_k20_get_fw_revision(void)
 {
-	if (fw_entry->size > APALIS_TK1_K20_FW_VER_ADDR)
-		return fw_entry->data[APALIS_TK1_K20_FW_VER_ADDR];
+	if (fw_entry)
+		if (fw_entry->size > APALIS_TK1_K20_FW_VER_ADDR)
+			return fw_entry->data[APALIS_TK1_K20_FW_VER_ADDR];
 	return 0;
 }
 #endif /* CONFIG_APALIS_TK1_K20_EZP */
@@ -1027,6 +1028,9 @@ static int apalis_tk1_k20_spi_remove(struct spi_device *spi)
 		gpio_free(apalis_tk1_k20->reset_gpio);
 	if (apalis_tk1_k20->int2_gpio >= 0)
 		gpio_free(apalis_tk1_k20->int2_gpio);
+
+	kfree(spi->controller_data);
+	spi->controller_data = NULL;
 
 	mfd_remove_devices(&spi->dev);
 	regmap_del_irq_chip(apalis_tk1_k20->irq, apalis_tk1_k20->irq_data);

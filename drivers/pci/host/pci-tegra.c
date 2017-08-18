@@ -1009,6 +1009,9 @@ static void tegra_pcie_port_reset(struct tegra_pcie_port *pp, u32 reset_reg)
 
 	mdelay(100);
 
+	/* Make sure LAN_WAKE_N gets re-configured as a GPIO input */
+	gpio_direction_input(LAN_WAKE_N);
+
 	/* Make sure controller gets enabled by disabling DEV_OFF_N */
 	gpio_set_value(LAN_DEV_OFF_N, 1);
 
